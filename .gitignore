@@ -1,0 +1,14 @@
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Virtual Environments
+faiml_env/
+venv/
+env/
+.env
+
+# Large model files and videos
+*.pth
+*.zip
+*.mp4
