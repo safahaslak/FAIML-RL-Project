@@ -41,8 +41,36 @@ def main() -> None:
         render_mode="rgb_array",
         reward_type="dense",
     )
+    
 
-    # TODO: add randomization wrapper here
+    ### 1.MODEL EĞİTİMİ (SIFIRDAN) ###
+
+    # 1. TODO: UDR Aralığı 5 kiloya çıkarıldı
+    mass_range = (0.3, 5.0) if args.sampling_strategy == "udr" else (1.0, 1.0)
+    env = RandomizationWrapper(env, mass_range=mass_range, mode=args.sampling_strategy)
+
+    # 2. TODO: Beyin Büyütüldü (policy_kwargs)
+    policy_kwargs = dict(net_arch=[512, 512, 512]) # 3 gizli katman, 512'şer nöron
+
+    model = SAC(
+        "MultiInputPolicy", 
+        env, 
+        learning_rate=3e-4, 
+        batch_size=1024, 
+        gamma=0.99,
+        policy_kwargs=policy_kwargs, # Büyük beyin eklendi
+        verbose=1
+    )
+    
+    model.learn(total_timesteps=args.timesteps)
+
+    save_name = f"sac_push_{args.sampling_strategy}_heavy_512net_{args.timesteps // 1000}k-vol2"
+    
+    model.save(save_name)
+
+    ### 2.MODEL (İLK DENEME) ###
+
+    """ # TODO: add randomization wrapper here
     # Define a wider mass range if UDR is selected, otherwise keep it constant (1.0 kg)
     mass_range = (0.5, 3.0) if args.sampling_strategy == "udr" else (1.0, 1.0)
     env = RandomizationWrapper(env, mass_range=mass_range, mode=args.sampling_strategy)
@@ -61,7 +89,7 @@ def main() -> None:
 
     save_name = f"sac_push_{args.sampling_strategy}_{args.env_type}_{args.timesteps // 1000}k"
     # TODO: model.save(save_name)
-    model.save(save_name)
+    model.save(save_name) """
 
 
 if __name__ == "__main__":
